@@ -17,7 +17,7 @@ This project implements the **Least Significant Bit (LSB)** steganography techni
 
 ### How LSB Steganography Works
 
-![LSB Steganography Process](LSB_steganography.png)
+<img src="images/LSB_steganography.png" alt="LSB Steganography Process" width="500">
 
 LSB steganography works by replacing the least significant bits of pixel values in an image with bits from the secret message
 
