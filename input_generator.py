@@ -3,8 +3,8 @@ import message_generator
 
 def generate_steganography_input(rows=256, columns=256):
     
-    start_row = random.randint(0, int(rows * 0.75))
-    start_col = random.randint(0, int(columns * 0.75))
+    start_row = random.randint(0, int(rows * 0.50))
+    start_col = random.randint(0, int(columns * 0.50))
     start_position = (start_row, start_col)
     
     num_bits = random.randint(1, 8)
@@ -12,7 +12,7 @@ def generate_steganography_input(rows=256, columns=256):
     channels_options = ['R', 'G', 'B', 'RG', 'RB', 'GB', 'RGB']
     channels = random.choice(channels_options)
     
-    gap = random.randint(0, 10)
+    gap = random.randint(0, 5)
     
     horizontal = random.choice([0, 1])
     
@@ -77,8 +77,8 @@ def generate_steganography_input(rows=256, columns=256):
         safe_max_characters = 1
     
     # Use more conservative percentage range
-    min_length = max(1, int(safe_max_characters * 0.1))
-    max_length = max(min_length, int(safe_max_characters * 0.20))  # Reduced from 0.25
+    min_length = max(1, int(safe_max_characters * 0.60))
+    max_length = max(min_length, int(safe_max_characters * 0.90))  # Reduced from 0.25
     
     message_length = random.randint(min_length, max_length)
     message = message_generator.generate_message_by_length(message_length)
