@@ -3,7 +3,7 @@ from PIL import Image
 import numpy as np
 import io
 import input_generator
-from encoding_decoding import decode_message, encode_message
+from encode_decode import decode_message, encode_message
 
 # Use the actual encoding function from encoding_decoding.py
 
@@ -100,27 +100,56 @@ if uploaded_file:
                         file_name="steganographed.png",
                         mime="image/png"
                     )
-                    # Store the last encoded image in session state
+                    # Store the last encoded image and parameters in session state
                     st.session_state['last_encoded_image'] = stego_image
+                    st.session_state['last_params'] = params
     elif action == "Detect hidden message in the image":
         st.header("Detect Hidden Image (Key Required)")
         image_to_check = image
+        current_params = {
+            'start_position': (0, 0),
+            'gap': 0,
+            'channels': 'RGB',
+            'num_bits': 1,
+            'delimiter_start': '#',
+            'delimiter_end': '#',
+            'horizontal': 1
+        }
+        
         if 'last_encoded_image' in st.session_state:
             option = st.radio(
                 "Which image do you want to check for a hidden message?",
                 ("Uploaded Image", "Last Encoded Image"),
-                horizontal=True
+                horizontal=True,
+                key='image_selection'
             )
             if option == "Last Encoded Image":
                 image_to_check = st.session_state['last_encoded_image']
+                if 'last_params' in st.session_state:
+                    current_params = st.session_state['last_params']
+            else:
+                # Reset to default values when switching to uploaded image
+                if 'previous_selection' in st.session_state and st.session_state['previous_selection'] != option:
+                    current_params = {
+                        'start_position': (0, 0),
+                        'gap': 0,
+                        'channels': 'RGB',
+                        'num_bits': 1,
+                        'delimiter_start': '#',
+                        'delimiter_end': '#',
+                        'horizontal': 1
+                    }
+            st.session_state['previous_selection'] = option
+            
         with st.form("key_form"):
-            key_start_position = st.text_input("Start Position (row,col)", value="0,0")
-            key_gap = st.text_input("Gap", value="0")
-            key_channels = st.text_input("Channels (e.g. RGB, R, G, B, RG, etc.)", value="RGB")
-            key_num_bits = st.text_input("Num Bits", value="1")
-            key_delimiter_start = st.text_input("Delimiter Start", value="#")
-            key_delimiter_end = st.text_input("Delimiter End", value="#")
-            key_horizontal = st.selectbox("Horizontal (1=row-wise, 0=column-wise)", [1, 0], index=0)
+            row, col = current_params['start_position']
+            key_start_position = st.text_input("Start Position (row,col)", value=f"{row},{col}")
+            key_gap = st.text_input("Gap", value=str(current_params['gap']))
+            key_channels = st.text_input("Channels (e.g. RGB, R, G, B, RG, etc.)", value=current_params['channels'])
+            key_num_bits = st.text_input("Num Bits", value=str(current_params['num_bits']))
+            key_delimiter_start = st.text_input("Delimiter Start", value=current_params['delimiter_start'])
+            key_delimiter_end = st.text_input("Delimiter End", value=current_params['delimiter_end'])
+            key_horizontal = st.selectbox("Horizontal (1=row-wise, 0=column-wise)", [1, 0], index=1 if current_params['horizontal'] == 0 else 0)
             submitted = st.form_submit_button("Check for Hidden Image")
         if submitted:
             try:
